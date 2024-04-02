@@ -44,14 +44,13 @@ jobs:
         uses: int128/kaniko-action@v1
         id: build-push
         with:
-          executor: gcr.io/kaniko-project/executor:v1.22.0-debug
+          executor: gcr.io/kaniko-project/executor:v1.6.0-debug
           verbosity: trace
           push: true
           context: .
           tags: ${{ steps.metadata.outputs.tags }}
           labels: ${{ steps.metadata.outputs.labels }}
           kaniko-args: |
-            --skip-push-permission-check
             --custom-platform=linux/arm64 
 
       - name: Print the Image Digest
