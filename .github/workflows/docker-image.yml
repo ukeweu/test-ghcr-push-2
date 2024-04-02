@@ -8,7 +8,7 @@ on:
 
 jobs:
   build:
-    runs-on: set-linux-arm64
+    runs-on: set-linux-arm64-dind
     permissions: write-all
     timeout-minutes: 120
 
