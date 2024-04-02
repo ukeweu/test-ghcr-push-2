@@ -49,6 +49,7 @@ jobs:
           context: .
           tags: ${{ steps.metadata.outputs.tags }}
           labels: ${{ steps.metadata.outputs.labels }}
+          kaniko-args: --custom-platform=linux/arm64 --skip-push-permission-check
 
       - name: Print the Image Digest
         run: echo "The image digest is ${{ steps.build-push.outputs.digest }}"
