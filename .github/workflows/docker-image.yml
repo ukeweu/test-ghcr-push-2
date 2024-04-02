@@ -8,7 +8,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: set-linux-arm64
     permissions: write-all
     timeout-minutes: 120
 
