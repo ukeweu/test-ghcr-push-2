@@ -1,0 +1,46 @@
+name: Build, GH hosted, kaniko
+run-name: Build, GH hosted, kaniko
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions: write-all
+    timeout-minutes: 120
+
+    outputs:
+      digest: ${{ steps.build-push.outputs.digest }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Docker meta
+        uses: docker/metadata-action@v5
+        id: metadata
+        with:
+          images: ghcr.io/${{ github.repository }}
+
+      - name: Build and Push
+        uses: int128/kaniko-action@v1
+        id: build-push
+        with:
+          push: true
+          context: .
+          tags: ${{ steps.metadata.outputs.tags }}_gh-hosted-kaniko
+          labels: ${{ steps.metadata.outputs.labels }}
+
+      - name: Print the Image Digest
+        run: echo "The image digest is ${{ steps.build-push.outputs.digest }}"

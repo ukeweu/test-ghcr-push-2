@@ -1,4 +1,5 @@
-name: Docker Image CI
+name: Build, self, kaniko
+run-name: Build, self, kaniko
 
 on:
   push:
@@ -8,7 +9,7 @@ on:
 
 jobs:
   build:
-    runs-on: set-linux-arm64
+    runs-on: set-linux-arm64-dind
     permissions: write-all
     timeout-minutes: 120
 
@@ -33,21 +34,12 @@ jobs:
           images: ghcr.io/${{ github.repository }}
 
       - name: Build and Push
-        #uses: docker/build-push-action@v5
-        #id: build-push
-        #with:
-        #  push: true
-        #  context: .
-        #  tags: ${{ steps.metadata.outputs.tags }}
-        #  labels: ${{ steps.metadata.outputs.labels }}
-        uses: int128/kaniko-action@v1
+        container: gcr.io/kaniko-project/executor:v1.22.0
         id: build-push
         with:
-          executor: gcr.io/kaniko-project/executor:v1.17.0-debug
-          verbosity: trace
           push: true
           context: .
-          tags: ${{ steps.metadata.outputs.tags }}
+          tags: ${{ steps.metadata.outputs.tags }}_self-kaniko
           labels: ${{ steps.metadata.outputs.labels }}
 
       - name: Print the Image Digest
