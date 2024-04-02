@@ -34,14 +34,21 @@ jobs:
           flavor: latest=true
 
       - name: Build and Push
-        uses: docker/build-push-action@v5
+        #uses: docker/build-push-action@v5
+        #id: build-push
+        #with:
+        #  push: true
+        #  context: .
+        #  tags: ${{ steps.metadata.outputs.tags }}
+        #  labels: ${{ steps.metadata.outputs.labels }}
+        #  platforms: linux/arm64
+        uses: int128/kaniko-action@v1
         id: build-push
         with:
           push: true
           context: .
           tags: ${{ steps.metadata.outputs.tags }}
           labels: ${{ steps.metadata.outputs.labels }}
-          platforms: linux/arm64
 
       - name: Print the Image Digest
         run: echo "The image digest is ${{ steps.build-push.outputs.digest }}"
