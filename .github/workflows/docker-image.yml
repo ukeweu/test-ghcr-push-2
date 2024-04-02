@@ -30,8 +30,7 @@ jobs:
         uses: docker/metadata-action@v5
         id: metadata
         with:
-          images: ghcr.io/ukeweu/test-ghcr-push
-          flavor: latest=true
+          images: ghcr.io/${{ github.repository }}
 
       - name: Build and Push
         #uses: docker/build-push-action@v5
@@ -45,11 +44,13 @@ jobs:
         uses: int128/kaniko-action@v1
         id: build-push
         with:
+          executor: gcr.io/kaniko-project/executor:v1.22.0-debug
+          verbosity: trace
           push: true
           context: .
           tags: ${{ steps.metadata.outputs.tags }}
           labels: ${{ steps.metadata.outputs.labels }}
-          kaniko-args: --custom-platform=linux/arm64 --skip-push-permission-check
+          kaniko-args: --skip-push-permission-check --custom-platform=linux/arm64 
 
       - name: Print the Image Digest
         run: echo "The image digest is ${{ steps.build-push.outputs.digest }}"
