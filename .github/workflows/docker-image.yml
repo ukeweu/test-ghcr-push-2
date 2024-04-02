@@ -8,7 +8,7 @@ on:
 
 jobs:
   build:
-    runs-on: set-linux-arm64-dind
+    runs-on: ubuntu-latest
     permissions: write-all
     timeout-minutes: 120
 
@@ -40,7 +40,6 @@ jobs:
         #  context: .
         #  tags: ${{ steps.metadata.outputs.tags }}
         #  labels: ${{ steps.metadata.outputs.labels }}
-        #  platforms: linux/arm64
         uses: int128/kaniko-action@v1
         id: build-push
         with:
