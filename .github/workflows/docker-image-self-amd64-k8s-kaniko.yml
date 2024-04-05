@@ -1,0 +1,46 @@
+name: Build, self (amd64, k8s), kaniko
+run-name: Build, self (amd64, k8s), kaniko
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: set-linux-amd64
+    container: 
+      image: gcr.io/kaniko-project/executor:v1.22.0-debug
+
+    permissions: write-all
+    timeout-minutes: 120
+
+    outputs:
+      digest: ${{ steps.build-push.outputs.digest }}
+
+    steps:
+      - name: Build and Push
+        id: build-push
+        # from https://some-natalie.dev/blog/kaniko-in-arc/
+        run: |
+          # Write config file, change to your destination registry
+          AUTH=$(echo -n ${{ github.actor }}:${{ secrets.GITHUB_TOKEN }} | base64)
+          echo "{\"auths\": {\"ghcr.io\": {\"auth\": \"${AUTH}\"}}}" > /kaniko/.docker/config.json
+
+          # Configure git
+          export GIT_USERNAME="kaniko-bot"
+          export GIT_PASSWORD="${{ secrets.GITHUB_TOKEN }}" # works for GHEC or GHES container registry
+
+          # Build and push (sub in your image, of course)
+          /kaniko/executor --dockerfile="./Dockerfile" \
+            --context="${{ github.repositoryUrl }}#${{ github.ref }}#${{ github.sha }}" \
+            --destination="ghcr.io/${{ github.repository }}:main_self-kaniko" \
+            --push-retry 5 \
+            --digest-file image-digest_${{ github.sha }}.txt
+
+          cat image-digest_${{ github.sha }}.txt
+          echo 'digest=$(cat image-digest_${{ github.sha }}.txt)' >> $GITHUB_OUTPUT
+       
+      - name: Print the Image Digest
+        run: echo "The image digest is ${{ steps.build-push.outputs.digest }}"

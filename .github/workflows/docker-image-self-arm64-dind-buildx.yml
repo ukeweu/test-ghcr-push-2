@@ -1,5 +1,5 @@
-name: Build, self, buildx
-run-name: Build, self, buildx
+name: Build, self (arm64, dind), buildx
+run-name: Build, self (arm64, dind), buildx
 
 on:
   push:
